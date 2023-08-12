@@ -5,16 +5,26 @@ import (
 	"strings"
 )
 
-type Type uint8
-
+/*
+NodeGroup is a type that define a group (as slice) that the nodes that are
+pointed by the node owner of group.
+*/
 type nodeGroup []*node
 
+/*
+Node are the minimal structures to implements connections in the automata, these
+represent to the states.
+*/
 type node struct {
 	name  	     string
 	terminalNode bool
 	adjacents 	 map[uint8]nodeGroup
 }
 
+/*
+Thhis node function add a node to the adjacents group using a character as key to get
+the group. If the connection didn't exist It will return true.
+*/
 func (n node) addAdjacent(node *node, character uint8) bool {
 	listAdjacents, ok := n.applyInput(character)
 
@@ -30,11 +40,15 @@ func (n node) addAdjacent(node *node, character uint8) bool {
 	return true
 }
 
+/*
+This node function return the result of apply a character input.
+*/
 func (n node) applyInput(character uint8) (nodeGroup, bool) {
 	data, ok := n.adjacents[character]
 	return data, ok
 }
 
+// This function is used to create nodes.
 func newNode(name string) *node {
 	nodeInstance := &node {
 		name: name,
@@ -44,6 +58,7 @@ func newNode(name string) *node {
 	return nodeInstance
 }
 
+// Semantical function used to compare if two nodes are equals (They have the same name).
 func EqualsNodes(nodeA, nodeB *node) bool {
 	return nodeA.name == nodeB.name
 }
@@ -52,6 +67,7 @@ func (n node) String() string {
 	return n.name
 }
 
+// Convert the info of the node into []byte to write it on a .graph file.
 func (n node) toBytes() []byte {
 	var sb strings.Builder
 	for char, nodeGroup := range n.adjacents {
