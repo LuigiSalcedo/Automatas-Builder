@@ -119,8 +119,9 @@ func mainMenu() {
 		fmt.Println("[7]. Set a terminal state.")
 		fmt.Println("[8]. Apply an input.")
 		fmt.Println("[9]. Save in a file.")
+		fmt.Println("[10]. Read inputs from file.")
 		fmt.Println()
-		fmt.Println("[10]. Exit.")
+		fmt.Println("[11]. Exit.")
 		fmt.Println()
 		fmt.Print("Select an option: ")
 		fmt.Scan(&op)
@@ -144,7 +145,9 @@ func mainMenu() {
 			applyInput()
 		case 9:
 			saveFile()
-		case 10: 
+		case 10:
+			readInputs() 
+		case 11:
 		default:
 			fmt.Println("\nOption is not valid . . .")
 		}
@@ -375,4 +378,46 @@ func saveFile() {
 	writer.Flush()
 	file.Close()
 	fmt.Println("\n[OK]: The automata was saved . . .")
+}
+
+func readInputs() {
+	fmt.Println("\nReading inputs from file\n")
+	fmt.Println("The inputs have to be in 'inputs' like an .txt file . . . ")
+
+	fileName := ""
+
+	fmt.Print("\nWrite the file name: ")
+	fmt.Scan(&fileName)
+
+	fileName = strings.Trim(fileName, " ")
+
+	if !strings.HasSuffix(fileName, ".txt") {
+		fileName += ".txt"
+	}
+
+	file, err := os.Open("inputs/" + fileName)
+
+	if err != nil {
+		fmt.Printf("\n[ERROR]:%v\n", err)
+		return 
+	}
+
+	scanner := bufio.NewScanner(file)
+
+	data := make(chan string, 10)
+
+	go readFile(scanner, data)
+
+	for input := range data {
+		fmt.Printf("\nInput: %v -> Output: %v\n", input, graph.ApplyInput(input))
+	}
+	file.Close()
+}
+
+func readFile(sc *bufio.Scanner, data chan<- string) {
+	defer close(data)
+
+	for sc.Scan(){ 
+		data <- string(sc.Bytes())
+	}
 }
