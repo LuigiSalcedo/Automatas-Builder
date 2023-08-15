@@ -107,7 +107,7 @@ func loadFromFile() error {
 func mainMenu() {
 	op := 0
 
-	for op != 10 {
+	for op != 11 {
 		fmt.Println("\nMain menu\n")
 
 		fmt.Println("[1]. Add a new node.")
