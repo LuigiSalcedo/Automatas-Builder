@@ -107,7 +107,7 @@ func loadFromFile() error {
 func mainMenu() {
 	op := 0
 
-	for op != 10 {
+	for op != 11 {
 		fmt.Println("\nMain menu\n")
 
 		fmt.Println("[1]. Add a new node.")
@@ -201,7 +201,7 @@ func modifyNode() {
 func createConnection() {
 	fmt.Println("\nCreating a connection\n")
 
-	var char string
+	var chars string
 
 	sourceName := ""
 	destinationName := ""
@@ -211,19 +211,34 @@ func createConnection() {
 
 	sourceName = strings.Trim(sourceName, " ")
 
+	_, ok := graph.Nodes[sourceName]
+
+	if !ok {
+		fmt.Printf("[Error]:There is no nodes named \"%v\"\n", sourceName)
+		return
+	}
+
 	fmt.Print("Write the destination node name: ")
 	fmt.Scan(&destinationName)
 
 	destinationName = strings.Trim(destinationName, " ")
 
-	fmt.Print("Write the character (transition) for this connection: ")	
-	fmt.Scan(&char)
-
-	ok := graph.CreateConnection(sourceName, destinationName, char[0])
+	_, ok = graph.Nodes[destinationName]
 
 	if !ok {
-		fmt.Println("\n[Error]: Please verify the data needed for this connection . . . ")
+		fmt.Printf("[Error]:There is no nodes named \"%v\"\n", destinationName)
 		return
+	}
+
+	fmt.Print("Write the character (transition) for this connection: ")	
+	fmt.Scan(&chars)
+
+	for _, char := range chars {
+		ok = graph.CreateConnection(sourceName, destinationName, uint8(char))
+
+		if !ok {
+			fmt.Printf("\n[Warning]: Maybe already exists a connection like %v - %c - %v . . . \n", sourceName, char, destinationName)
+		}
 	}
 
 	fmt.Println("\nConnection has been created . . . ")
